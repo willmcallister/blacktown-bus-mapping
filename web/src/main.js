@@ -86,7 +86,6 @@ map.on("load", () => {
         'id': 'stop_inventory',
         'type': 'circle',
         'source': 'stop_inventory_source',
-        // 'source-layer': 'suburb_stops',
         'paint': {
             'circle-color': [
                 "match",
@@ -103,25 +102,8 @@ map.on("load", () => {
             "circle-stroke-color": "#555"
         }
     });
-    /*
-    map.addSource('stop_nodes_source', {
-        type: 'geojson',
-        data: 'data/stop_nodes.geojson'
-    });
-    map.addLayer({
-        'id': 'stop_nodes',
-        'type': 'circle',
-        'source': 'stop_nodes_source',
-        // 'source-layer': 'suburb_stops',
-        'paint': {
-            'circle-color': 'orange',
-            'circle-radius': 6
-        }
-    });
-    */
 
-
-    /*
+    /* ---- for hover popup ----
     // Create a popup, but don't add it to the map yet.
     const popup = new maplibregl.Popup({
         closeButton: false,
@@ -166,8 +148,6 @@ map.on("load", () => {
         map.setFilter('walksheds_400m', null);
     });
     */
-    
-
 });
 
 function setupFilter() {
@@ -205,6 +185,8 @@ function filterLayers(choice) {
         map.setFilter('stop_inventory', ['==', ['get', 'suburb'], choice]);
         map.setFilter('suburbs', ['==', ['get', 'name'], choice]);
     }
+
+    return;
 }
 
 function createLegend() {
@@ -233,6 +215,8 @@ function createLegend() {
     });
 
     document.getElementById("map").appendChild(legendContainer);
+
+    return;
 }
 
 
