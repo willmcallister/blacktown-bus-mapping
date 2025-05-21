@@ -5,50 +5,62 @@ library(httr2)
 library(tidytransit)
 library(mapgl)
 
-setwd("/Users/will/Desktop/blacktown-bus-mapping")
+setwd("/Users/will/Documents/Github/blacktown-bus-mapping")
 
+# ----- Download LGA Boundaries from NSW Spatial Data Portal -----
 # Build query URL
-url <- parse_url("https://portal.spatial.nsw.gov.au/server/rest/services")
+url <- httr2::url_parse("https://portal.spatial.nsw.gov.au/server/rest/services")
 url$path <- paste(url$path, "NSW_Administrative_Boundaries_Theme_multiCRS/FeatureServer/8/query", sep = "/")
 url$query <- list(where = "lganame = 'BLACKTOWN'",
                   outFields = "lganame, councilname, OBJECTID",
                   returnGeometry = "true",
                   f = "geojson")
-request <- build_url(url)
+lga_request <- httr2::url_build(url)
 
-# Request Feature Service and read to a sf object
-blacktown_lga <- st_read(request)
 
-# Write blacktown lga to geojson
+url <- httr2::url_parse("https://portal.spatial.nsw.gov.au/server/rest/services")
+url$path <- paste(url$path, "NSW_Administrative_Boundaries_Theme_multiCRS/FeatureServer/2/query", sep = "/")
+url$query <- list(where = "suburbname IN ('GLENWOOD', 'ACACIA GARDENS')",
+                  outFields = "suburbname, postcode, OBJECTID",
+                  returnGeometry = "true",
+                  f = "geojson")
+suburb_request <- httr2::url_build(url)
+
+
+# Request Feature Services and read to sf objects
+blacktown_lga <- st_read(lga_request)
+suburbs <- st_read(suburb_request)
+
+# Rename fields
+blacktown_lga <- blacktown_lga |>
+  rename(
+    name = lganame,
+    id = OBJECTID
+  ) |>
+  select(id, name, councilname)
+
+suburbs <- suburbs |>
+  rename(
+    name = suburbname,
+    id = OBJECTID
+    ) |>
+  select(id, name, postcode)
+
+# Write SFs to geojson
 dir.create(file.path(getwd(), "data"), showWarnings = FALSE) # create data dir if doesn't already exist
 st_write(blacktown_lga, "data/blacktown_lga.geojson")
+st_write(suburbs, "data/suburbs.geojson")
+
+
 
 # Convert from geojson to pmtiles to save on file size
 system("tippecanoe -z15 -o data/blacktown_lga.pmtiles --drop-densest-as-needed data/blacktown_lga.geojson")
 
-# Delete geojson
-file.remove("data/blacktown_lga.geojson")
-
-#gtfs_url <- 'https://opendata.transport.nsw.gov.au/data/dataset/d1f68d4f-b778-44df-9823-cf2fa922e47f/resource/e70b3c19-ed72-48b0-bc66-7054ad04d946/download/prod_fixed_gtfs_2.0.json'
-
-gtfs_url <- 'https://api.transport.nsw.gov.au/v1/publictransport/timetables/complete/gtfs'
-  
-# Create a request passing in apikey in header (using httr2)
-transport_nsw_request <- request(gtfs_url) |> 
-  req_method("GET") |>
-  req_headers(accept = "application/gzip",
-    Authorization = 'apikey YOUR_API_KEY_HERE')
-
-# create data dir if doesn't already exist
-dir.create(file.path(getwd(), "data/transport_nsw_gtfs"), showWarnings = FALSE)
-
-# Perform request
-req_perform(
-  transport_nsw_request,
-  path = "data/transport_nsw_gtfs/gtfs.zip")
 
 
-transport_nsw_gtfs <- read_gtfs("data/transport_nsw_gtfs/gtfs.zip")
+
+
+
 
 nsw_stops <- stops_as_sf(transport_nsw_gtfs$stops)
 
@@ -64,6 +76,7 @@ routes_in_blacktown <- st_filter(nsw_routes, blacktown_lga)
 st_write(stops_in_blacktown, "data/stops.geojson")
 st_write(routes_in_blacktown, "data/routes.geojson")
 
+# Delete GTFS .zip file
 file.remove("data/transport_nsw_gtfs/gtfs.zip")
 unlink("data/transport_nsw_gtfs", recursive = T)
 

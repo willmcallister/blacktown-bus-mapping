@@ -1,0 +1,257 @@
+---
+title: "data-prep"
+format: html
+editor: visual
+knitr:
+  opts_chunk:
+    dev: ragg_png
+---
+
+```{r}
+# Libraries
+library(dplyr)
+library(sf)
+library(geojsonsf)
+library(stringr)
+library(httr2)
+library(tidytransit)
+library(mapgl)
+library(knitr)
+library(DBI)
+library(dotenv)
+library(RPostgres)
+```
+
+## Grab LGA and Suburb boundaries from NSW Gov
+
+```{r}
+setwd("/Users/will/Documents/Github/blacktown-bus-mapping")
+
+# ----- Download LGA and Suburb Boundaries from NSW Spatial Data Portal -----
+# Build query URL
+url <- httr2::url_parse("https://portal.spatial.nsw.gov.au/server/rest/services")
+url$path <- paste(url$path, "NSW_Administrative_Boundaries_Theme_multiCRS/FeatureServer/8/query", sep = "/")
+url$query <- list(where = "lganame = 'BLACKTOWN'",
+                  outFields = "lganame, councilname, OBJECTID",
+                  returnGeometry = "true",
+                  f = "geojson")
+lga_request <- httr2::url_build(url)
+
+url <- httr2::url_parse("https://portal.spatial.nsw.gov.au/server/rest/services")
+url$path <- paste(url$path, "NSW_Administrative_Boundaries_Theme_multiCRS/FeatureServer/2/query", sep = "/")
+url$query <- list(where = "suburbname IN ('GLENWOOD', 'ACACIA GARDENS')",
+                  outFields = "suburbname, postcode, OBJECTID",
+                  returnGeometry = "true",
+                  f = "geojson")
+suburb_request <- httr2::url_build(url)
+
+# Request Feature Services and read to sf objects
+blacktown_lga <- st_read(lga_request)
+suburbs <- st_read(suburb_request)
+
+# Rename fields
+blacktown_lga <- blacktown_lga |>
+  rename(
+    name = lganame,
+    id = OBJECTID
+  ) |>
+  mutate(name = str_to_title(name), councilname = str_to_title(councilname)) |>
+  select(id, name, councilname)
+
+suburbs <- suburbs |>
+  rename(
+    name = suburbname,
+    id = OBJECTID
+    ) |>
+  mutate(name = str_to_title(name)) |>
+  select(id, name, postcode)
+
+# Write SFs to geojson
+dir.create(file.path(getwd(), "data"), showWarnings = FALSE) # create data dir if doesn't already exist
+st_write(blacktown_lga, "data/blacktown_lga.geojson")
+st_write(suburbs, "data/suburbs.geojson")
+```
+
+## Get Request for GTFS Data
+
+```{r}
+# ----- Download GTFS Data from Transport for NSW -----
+gtfs_url <- 'https://api.transport.nsw.gov.au/v1/publictransport/timetables/complete/gtfs'
+apikey <- 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxZ3UzZE5pN0ZaY0RrS3RYaEV6aVRKcmo0QnpDVVdwbFYyUFMzV011d2NjIiwiaWF0IjoxNzQ0MjY0OTU0fQ.dqEo_amFsC8uN_mfTmx7iET5lzamEWqadu0Mgrf2WYI'
+
+# Create a request passing in apikey in header (using httr2)
+transport_nsw_request <- request(gtfs_url) |> 
+  req_method("GET") |>
+  req_headers(accept = "application/gzip",
+    Authorization = paste('apikey', apikey))
+
+# create data dir if doesn't already exist
+dir.create(file.path(getwd(), "data/transport_nsw_gtfs"), showWarnings = FALSE)
+
+# Perform request, save zip within transport_nsw_gtfs folder
+req_perform(
+  transport_nsw_request,
+  path = "data/transport_nsw_gtfs/gtfs.zip")
+```
+
+```{r}
+# Establish Database Connection
+dotenv::load_dot_env()
+
+pg_conn <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = "willmapdb",
+  host = Sys.getenv("DB_HOST"),
+  port = Sys.getenv("DB_PORT"),
+  user = Sys.getenv("DB_USER"),
+  password = Sys.getenv("DB_PASS")
+)
+
+st_write(suburbs, pg_conn, Id(schema = "suburb", table = "blacktown_suburbs"))
+st_write(blacktown_lga, pg_conn, Id(schema = "public", table = "blacktown_lga"))
+
+suburbs <- st_read(pg_conn, Id(schema = "public", table = "blacktown_suburbs"))
+
+suburbs
+```
+
+## Read GTFS and Suburb Poly from data folder
+
+```{r}
+# Read GTFS from zip file using tidytransit
+transport_nsw_gtfs <- read_gtfs("data/transport_nsw_gtfs/gtfs.zip")
+
+# Read suburb geojson
+suburbs <- geojson_sf("data/suburbs.geojson")
+
+blacktown_lga <- geojson_sf("data/blacktown_lga.geojson")
+suburbs
+
+```
+
+```{r}
+
+# Filter stops to only stops within our two suburbs
+suburb_stops <- st_filter(stops_as_sf(transport_nsw_gtfs$stops), suburbs)
+
+# Use semi_join to filter stops table in gtfs to only those within the suburbs
+transport_nsw_gtfs$stops <- transport_nsw_gtfs$stops |>
+  semi_join(suburb_stops, by = join_by(stop_id))
+
+# Same thing on stop_times df
+transport_nsw_gtfs$stop_times <- transport_nsw_gtfs$stop_times |>
+  semi_join(suburb_stops, by = join_by(stop_id))
+
+# transport_nsw_gtfs$trips <- transport_nsw_gtfs$trips |>
+#  semi_join(transport_nsw_gtfs$stop_times, by = join_by(trip_id))
+```
+
+```{r}
+# get the id of the first stop in the trip's stop sequence
+first_stop_id <- transport_nsw_gtfs$stop_times %>% 
+  group_by(trip_id) %>% 
+  summarise(stop_id = stop_id[which.min(stop_sequence)])
+
+# join with the stops table to get the stop_name
+first_stop_names <- left_join(first_stop_id, transport_nsw_gtfs$stops, by="stop_id")
+
+# rename the first stop_name as trip_origin
+trip_origins <- first_stop_names %>% select(trip_id, trip_origin = stop_name)
+
+# join the trip origins back onto the trips
+transport_nsw_gtfs$trips <- right_join(transport_nsw_gtfs$trips, trip_origins, by = "trip_id")
+
+transport_nsw_gtfs$trips %>%
+  select(route_id, trip_origin)
+
+
+# "Glenwood Park Dr Before Dairy Ct" # id 2768108
+
+stop_ids <- transport_nsw_gtfs$stops %>% 
+  # filter(stop_name == "Glenwood Park Dr Before Dairy Ct") %>% 
+  select(stop_id)
+
+departures <- stop_ids %>% 
+  inner_join(transport_nsw_gtfs$stop_times %>% 
+               select(trip_id, arrival_time, 
+                      departure_time, stop_id), 
+             by = "stop_id")
+
+departures <- departures %>% 
+  left_join(transport_nsw_gtfs$trips %>% 
+              select(trip_id, route_id, 
+                     service_id, trip_headsign, 
+                     trip_origin), 
+            by = "trip_id")
+
+departures <- departures %>% 
+  left_join(transport_nsw_gtfs$routes %>% 
+              select(route_id, 
+                     route_short_name), 
+            by = "route_id")
+
+formatted_departures <- departures |>
+  select(arrival_time,
+         trip_headsign,
+         trip_origin,
+         route_short_name,
+         route_id)
+
+
+# weekday services (using 23-04-2025 as a representative Wednesday)
+weekday_services <- transport_nsw_gtfs$.$dates_services |>
+  filter(date == "2025-04-23") |>
+  select(service_id)
+
+weekday_departures <- departures %>% 
+  right_join(weekday_services, by = "service_id")
+
+
+weekday_departures %>%
+  arrange(departure_time, stop_id, route_short_name) %>% 
+  select(departure_time, stop_id, route_short_name, trip_headsign) %>% 
+  filter(departure_time >= hms::hms(hours = 7)) %>% 
+  filter(departure_time < hms::hms(hours = 19)) %>%
+  group_by(stop_id) %>%
+  arrange(stop_id)
+```
+
+```{r}
+# Mapping
+
+maplibre(
+  #center = c(150.87447, -33.74384),
+  #zoom = 10
+  bounds = suburbs
+) |>
+  add_fullscreen_control() |>
+  add_navigation_control(position = "top-left") |>
+  add_line_layer(
+    id = 'blacktown-outline',
+    source = blacktown_lga,
+    line_width = 2,
+    line_color = "black",
+    line_opacity = 0.5,
+    line_dasharray = c(4, 2),
+    visibility = "visible"
+  ) |>
+  add_line_layer(
+    id = 'bus-routes',
+    source = bus_routes,
+    tooltip = 'route_type',
+    line_width = 4,
+    line_color = 'blue',
+    line_opacity = 0.7
+  ) |>
+  add_line_layer(
+    id = 'suburb-outline',
+    source = suburbs,
+    line_width = 1.5,
+    line_color = "darkred",
+    line_opacity = 0.5,
+    line_dasharray = c(4, 2),
+    visibility = "visible"
+  )
+  
+
+```
