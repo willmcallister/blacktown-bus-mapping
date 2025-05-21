@@ -12,7 +12,7 @@ maplibregl.addProtocol("pmtiles", protocol.tile);
 
 const map = new maplibregl.Map({
     container: 'map', // container id
-    style: '/data/minimal-style.json', // custom style using openfreemap
+    style: 'data/minimal-style.json', // custom style using openfreemap
     center: [150.925, -33.738], // starting position [lng, lat]
     zoom: 13, // starting zoom
     attributionControl: {

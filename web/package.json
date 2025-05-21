@@ -2,13 +2,17 @@
   "name": "blacktown-bus-mapping",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://willmcallister.github.io/blacktown-bus-mapping/",
   "type": "module",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "vite": "^6.2.0"
   },
   "dependencies": {
