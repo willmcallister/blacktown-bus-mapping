@@ -1,4 +1,9 @@
-// vite.config.js
-export default {
-  base: "/blacktown-bus-mapping/"
-}
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  base: "/blacktown-bus-mapping/",
+  build: {
+  	outDir: '../dist',
+  	emptyOutDir: true
+  }
+})

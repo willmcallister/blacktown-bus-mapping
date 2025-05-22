@@ -30,7 +30,7 @@ map.addControl(new maplibregl.NavigationControl({
 map.addControl(new maplibregl.FullscreenControl());
 
 map.on("load", () => {
-    /*
+    
     map.addSource('walkshed_400m_source', {
         type: 'geojson',
         data: 'data/walkshed_400m_new.geojson'
@@ -44,7 +44,7 @@ map.on("load", () => {
             'fill-opacity': 0.7,
         }
     });
-    */
+    
 
     map.addSource('suburbs_source', {
         type: 'geojson',
@@ -61,7 +61,7 @@ map.on("load", () => {
         }
     });
     
-    /*
+    
     map.addSource('suburb_stops_source', {
         type: 'geojson',
         data: 'data/bus_stops.geojson'
@@ -72,11 +72,13 @@ map.on("load", () => {
         'source': 'suburb_stops_source',
         // 'source-layer': 'suburb_stops',
         'paint': {
-            'circle-color': 'blue',
-            'circle-radius': 4
+            'circle-color': '#009ED7',
+            'circle-radius': 5,
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#555"
         }
     });
-    */
+    
 
     map.addSource('stop_inventory_source', {
         type: 'geojson',
@@ -103,11 +105,44 @@ map.on("load", () => {
         }
     });
 
-    /* ---- for hover popup ----
+    // hide layers on map load
+    map.setLayoutProperty('walksheds_400m', 'visibility', 'none');
+    map.setLayoutProperty('suburb_stops', 'visibility', 'none');
+
+    map.on('click', 'stop_inventory', (e) => {
+        // Get the first feature that was clicked
+        const feature = e.features[0];
+
+        // Coordinates for the popup (adjust if it's a LineString or Polygon)
+        const coordinates = feature.geometry.coordinates.slice();
+
+        // Optional: adjust coordinates to avoid glitches if the map is zoomed out
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Define your popup content (customize as needed)
+        const popupContent = `
+            <strong>Stop ID:</strong> ${feature.properties.stop_id}<br/>
+            <strong>Shelter:</strong> ${feature.properties.shelter}<br/>
+            <strong>Seat:</strong> ${feature.properties.seat}<br/>
+            <strong>Timetable:</strong> ${feature.properties.timetable}<br/>
+            <strong>Advertising:</strong> ${feature.properties.advertising}<br/>
+        `;
+
+        // Create and set the popup
+        new maplibregl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(popupContent)
+            .addTo(map);
+    });
+
+
+    
     // Create a popup, but don't add it to the map yet.
     const popup = new maplibregl.Popup({
-        closeButton: false,
-        closeOnClick: false
+        closeButton: true,
+        closeOnClick: true
     });
     
     // Make sure to detect marker change for overlapping markers
@@ -147,8 +182,9 @@ map.on("load", () => {
 
         map.setFilter('walksheds_400m', null);
     });
-    */
+    
 });
+
 
 function setupFilter() {
     const filterContainer = document.getElementById('filter-container');
@@ -172,16 +208,17 @@ function setupFilter() {
     return;
 }
 
+
 function filterLayers(choice) {
     // filter bus stops and suburbs
     if(choice == 'Both') {
         // reset filter for both layers
-        // map.setFilter('suburb_stops', null);
+        map.setFilter('suburb_stops', null);
         map.setFilter('stop_inventory', null);
         map.setFilter('suburbs', null);
     }
     else {
-        // map.setFilter('suburb_stops', ['==', ['get', 'suburb_name'], choice]);
+        map.setFilter('suburb_stops', ['==', ['get', 'suburb_name'], choice]);
         map.setFilter('stop_inventory', ['==', ['get', 'suburb'], choice]);
         map.setFilter('suburbs', ['==', ['get', 'name'], choice]);
     }
@@ -189,9 +226,70 @@ function filterLayers(choice) {
     return;
 }
 
+
+function setupLayerSelect() {
+    const layerSelectContainer = document.getElementById("layer-select-container");
+    
+    const layerNames = ['Stop Inventory', 'Walksheds'];
+
+    layerNames.forEach((layer) => {
+        const radioBtn = document.createElement("input");
+        radioBtn.className = "layer-select";
+        radioBtn.type = "radio";
+        radioBtn.id = `layer-select-${layer}`;
+        radioBtn.name = "layer-select";
+        radioBtn.value = layer;
+        radioBtn.addEventListener("click", (e) => {
+            toggleLayers(e);
+        });
+
+        const radioLabel = document.createElement("label");
+        radioLabel.className = "layer-select-btn"
+        radioLabel.htmlFor = `layer-select-${layer}`;
+        radioLabel.innerText = layer;
+
+        layerSelectContainer.appendChild(radioBtn);
+        layerSelectContainer.appendChild(radioLabel);
+    });
+
+    // toggle first button
+    document.getElementById("layer-select-Stop Inventory").checked = true;
+
+    return;
+}
+
+
+function toggleLayers(elem) {
+    if(elem.target.value == 'Walksheds') {
+        // hide stop inventory
+        map.setLayoutProperty('stop_inventory', 'visibility', 'none');
+
+        // show stops and walksheds
+        map.setLayoutProperty('walksheds_400m', 'visibility', 'visible');
+        map.setLayoutProperty('suburb_stops', 'visibility', 'visible');
+
+        // hide legend
+        document.getElementById("inventory-legend").style.display = "none";
+    }
+    else {
+        // hide stops and walksheds
+        map.setLayoutProperty('walksheds_400m', 'visibility', 'none');
+        map.setLayoutProperty('suburb_stops', 'visibility', 'none');
+
+        // show stop inventory
+        map.setLayoutProperty('stop_inventory', 'visibility', 'visible');
+
+        // show legend
+        document.getElementById("inventory-legend").style.display = "block";
+    }
+    
+    return;
+}
+
 function createLegend() {
     const legendContainer = document.createElement("div");
     legendContainer.className = "legend";
+    legendContainer.id = "inventory-legend"
 
     const legendTitle = document.createElement("h4");
     legendTitle.innerText = "Number of Stop Amenities"
@@ -221,4 +319,5 @@ function createLegend() {
 
 
 setupFilter();
+setupLayerSelect();
 createLegend();

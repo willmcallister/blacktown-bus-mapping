@@ -5,78 +5,48 @@
 }
 
 body {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    grid-template-areas:
-        "header"
-        "sidebar"
-        "content"
-        "footer";
     margin: 0;
     padding: 0; 
 }
 
-html, body, #map, #sidebar { 
+html, body, #map { 
     height: 100dvh;
 }
 
-#map {
-    grid-area: content;
-}
 
 #sidebar {
-    grid-area: sidebar;
+    position: absolute;
+    top: 0px;
     z-index: 1;
+    width: 300px;
+    height: 225px;
+    background-color: white;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     padding-left: 20px;
 }
 
-.map-legend {
-    grid-area: content;
-    display: inline-block;
-
-    position: absolute;
-    z-index: 1;
-    bottom: 20px;
-    left: 20px;
-    border-radius: 3px;
-    bottom: 30px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    background-color: white;
-}
 
 #filter-container {
     background-color: white;
 }
 
-@media (min-width: 700px) {
-    body {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        grid-template-areas:
-        "header header  header"
-        "sidebar    content content"
-        "sidebar    content content"
-        "footer footer  footer";
-  }
-}
-
 
 .legend {
-        background-color: #fff;
-        border-radius: 3px;
-        bottom: 30px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        font:
-            12px/20px 'Helvetica Neue',
-            Arial,
-            Helvetica,
-            sans-serif;
-        padding: 10px;
-        position: absolute;
-        left: 10px;
-        z-index: 1;
-    }
+    display: block;
+    background-color: #fff;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font:
+        12px/20px 'Helvetica Neue',
+        Arial,
+        Helvetica,
+        sans-serif;
+    padding: 10px;
+    position: absolute;
+    left: 10px;
+    z-index: 1;
+}
 
 .legend h4 {
     margin: 0 0 10px;
@@ -85,14 +55,18 @@ html, body, #map, #sidebar {
 .legend div span {
     border-radius: 50%;
     display: inline-block;
-    height: 10px;
-    margin-right: 5px;
-    width: 10px;
+    height: 16px;
+    margin-right: 8px;
+    width: 16px;
     border: 1px solid #555;
+    vertical-align: middle;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 .legend .legend-label {
     display: inline-block;
     margin: 0;
     padding: 0;
+    font-weight: bold;
 }
