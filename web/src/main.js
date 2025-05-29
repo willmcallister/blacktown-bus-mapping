@@ -33,7 +33,7 @@ map.on("load", () => {
     
     map.addSource('walkshed_400m_source', {
         type: 'geojson',
-        data: 'data/walkshed_400m_new.geojson'
+        data: 'data/walkshed_400m.geojson'
     });
     map.addLayer({
         'id': 'walksheds_400m',

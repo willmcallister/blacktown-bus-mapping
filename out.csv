@@ -1,0 +1,83 @@
+stop_id,shelter,seat,timetable,advertising,other_comments,stop_name,suburb,num_amenities
+2763144,Yes,Yes,Yes,No,school bus stop,"Quakers Hill East Public School, Chase Dr",Acacia Gardens,3
+2763141,no,no,no,no,Not a sign to indicate,Chase Dr Opp Quakers Hill East Public School,Acacia Gardens,0
+2763142,no,no,no,no,Not a sign to indicate,Chase Dr At Hydrangea Ct,Acacia Gardens,0
+2763143,no,no,no,no,,Chase Dr After Quakers Hill Pkwy,Acacia Gardens,0
+2763136,no,no,no,no,extremely busy street; dangerous,Quakers Hill Pkwy Before Chase Dr,Acacia Gardens,0
+2763135,yes,yes,no,yes,,Quakers Hill Pkwy After Sunnyholt Rd,Acacia Gardens,0
+276859,no,no,no,no,,Sunnyholt Rd After Wilson Rd,Acacia Gardens,0
+2763140,no,no,no,no,,Wilson Rd After Trevor Toms Dr,Acacia Gardens,0
+2763147,no,no,no,no,,Wilson Rd After Tamarind Dr,Acacia Gardens,0
+2763179,no,no,no,no,,Wilson Rd Before Sciarra Cres,Acacia Gardens,0
+2763145,no,no,no,no,,Wilson Rd After Chase Dr,Acacia Gardens,0
+276366,no,no,no,no,,Wilson Rd At Sciarra Cres,Acacia Gardens,0
+2763180,no,no,no,no,,Wilson Rd Opp Sampson Cres,Acacia Gardens,0
+276367,no,no,no,no,,Wilson Rd At Sampson Cres,Acacia Gardens,0
+276327,no,no,yes,no,small schedule posted,Wilson Rd After Corinne St,Acacia Gardens,0
+2763174,no,no,no,no,alongside 4 lane road,Quakers Hill Pkwy At Pye Rd,Acacia Gardens,0
+276369,no,no,no,no,,Quakers Hill Pkwy Before Pye Rd,Acacia Gardens,0
+2768144,Yes,Yes,Yes,Yes,"There was no available street view data on the street of the bus stop, thus the bus stop was viewed from 33°45'07""S 150°57'06""E.",,Glenwood,4
+2153389,Yes,Yes,Yes,Yes,Norwest Childrens Specialist,,Glenwood,4
+2768145,Yes,Yes,Yes,Yes,Norwest Childrens Specialist,,Glenwood,4
+2768167,No,No,No,No,Norwest Childrens Specialist,,Glenwood,0
+2768146,Yes,Yes,Yes,Yes,Valentine Sports Park,,Glenwood,4
+2768147,Yes,Yes,Yes,Yes,Valentine Sports Park,,Glenwood,4
+2768149,Yes,Yes,Yes,Yes,,,Glenwood,4
+2768148,Yes,Yes,Yes,Yes,Emmanuel Baptist Church,,Glenwood,4
+2768150,Yes,Yes,Yes,Yes,Parklea Markets,,Glenwood,4
+2768151,Yes,Yes,Yes,Yes,Parklea Markets,,Glenwood,4
+2768153,Yes,Yes,Yes,Yes,,,Glenwood,4
+2768152,Yes,Yes,Yes,Yes,,,Glenwood,4
+2768154,Yes,Yes,Yes,Yes,,,Glenwood,4
+2768155,Yes,Yes,Yes,Yes,,,Glenwood,4
+276814,No,No,Yes,No,Gurdwara Sahib Glenwood,,Glenwood,1
+276834,,,,,Gurdwara Sahib Glenwood. Not even sure if this is a bus stop.,,Glenwood,0
+276815,,,,,Holy Cross Primary School. Not even sure if this is a bus stop.,,Glenwood,0
+276816,No,No,Yes,No,,,Glenwood,1
+276833,No,No,Yes,No,,,Glenwood,1
+276832,Yes,Yes,Yes,No,,,Glenwood,3
+276819,Yes,Yes,Yes,No,,,Glenwood,3
+2768110,No,No,Yes,No,,,Glenwood,1
+276874,No,No,Yes,No,,,Glenwood,1
+276877,Yes,Yes,Yes,No,,,Glenwood,3
+276836,Yes,Yes,Yes,No,,,Glenwood,3
+276875,No,No,Yes,No,,,Glenwood,1
+2768164,No,No,Yes,No,,,Glenwood,1
+276835,No,No,Yes,No,,,Glenwood,1
+276820,Yes,Yes,Yes,No,,,Glenwood,3
+2768109,No,No,Yes,No,,,Glenwood,1
+276821,No,No,No,No,,,Glenwood,0
+2768108,No,No,No,No,,,Glenwood,0
+276822,No,No,Yes,No,,,Glenwood,1
+2768107,Yes,Yes,Yes,No,,,Glenwood,3
+276823,No,No,No,No,Parklea Public School. Is this even a bus stop,,Glenwood,0
+2768106,No,No,Yes,No,,,Glenwood,1
+276824,Yes,Yes,Yes,No,,,Glenwood,3
+276825,No,No,Yes,No,,,Glenwood,1
+2768105,No,No,Yes,No,,,Glenwood,1
+2768165,No,No,Yes,No,,,Glenwood,1
+2768104,No,No,Yes,No,,,Glenwood,1
+276826,No,No,Yes,No,,,Glenwood,1
+2768103,No,No,Yes,No,,,Glenwood,1
+2768163,No,No,No,No,Glenwood High School. Is this even a bus stop,,Glenwood,0
+276870,No,No,Yes,No,,,Glenwood,1
+276871,No,No,Yes,No,,,Glenwood,1
+276880,Yes,Yes,Yes,No,,,Glenwood,3
+276872,No,No,Yes,No,,,Glenwood,1
+276879,Yes,Yes,Yes,No,,,Glenwood,3
+276873,No,No,Yes,No,,,Glenwood,1
+276878,No,No,Yes,No,,,Glenwood,1
+276827,Yes,Yes,Yes,No,,,Glenwood,3
+276869,No,Yes,Yes,No,,,Glenwood,2
+276828,No,No,Yes,No,,,Glenwood,1
+276829,No,No,Yes,No,,,Glenwood,1
+276868,No,No,Yes,No,,,Glenwood,1
+276867,Yes,Yes,Yes,No,,,Glenwood,3
+276881,Yes,Yes,Yes,No,,,Glenwood,3
+276830,No,No,No,No,Is this even a bus stop,,Glenwood,0
+276831,No,No,No,No,Is this even a bus stop,,Glenwood,0
+276890,No,No,No,No,Is this even a bus stop,,Glenwood,0
+276866,No,No,Yes,No,,,Glenwood,1
+276882,Yes,Yes,Yes,No,,,Glenwood,3
+276865,No,No,Yes,No,,,Glenwood,1
+276883,No,No,Yes,No,,,Glenwood,1
