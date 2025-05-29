@@ -1,1 +1,8 @@
+# environments
 .env
+
+# r files
+.Rhistory
+
+# dist folder (deployed on gh-pages branch)
+/dist
