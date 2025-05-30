@@ -216,11 +216,13 @@ function filterLayers(choice) {
         map.setFilter('suburb_stops', null);
         map.setFilter('stop_inventory', null);
         map.setFilter('suburbs', null);
+        map.setFilter('walksheds_400m', null);
     }
     else {
         map.setFilter('suburb_stops', ['==', ['get', 'suburb_name'], choice]);
         map.setFilter('stop_inventory', ['==', ['get', 'suburb'], choice]);
         map.setFilter('suburbs', ['==', ['get', 'name'], choice]);
+        map.setFilter('walksheds_400m', ['==', ['get', 'suburb_name'], choice]);
     }
 
     return;
