@@ -72,7 +72,7 @@ map.on("load", () => {
         'source': 'suburb_stops_source',
         // 'source-layer': 'suburb_stops',
         'paint': {
-            'circle-color': '#009ED7',
+            'circle-color': '#019DD5',
             'circle-radius': 5,
             "circle-stroke-width": 1,
             "circle-stroke-color": "#555"
@@ -270,8 +270,9 @@ function toggleLayers(elem) {
         map.setLayoutProperty('walksheds_400m', 'visibility', 'visible');
         map.setLayoutProperty('suburb_stops', 'visibility', 'visible');
 
-        // hide legend
+        // hide inventory legend, show walkshed legend
         document.getElementById("inventory-legend").style.display = "none";
+        document.getElementById("walkshed-legend").style.display = "block";
     }
     else {
         // hide stops and walksheds
@@ -281,21 +282,53 @@ function toggleLayers(elem) {
         // show stop inventory
         map.setLayoutProperty('stop_inventory', 'visibility', 'visible');
 
-        // show legend
+        // show inventory legend, hide walkshed legend
         document.getElementById("inventory-legend").style.display = "block";
+        document.getElementById("walkshed-legend").style.display = "none";
     }
     
     return;
 }
 
+function setupBoundaryToggle() {
+    const boundaryContainer = document.getElementById("boundary-toggle-container");
+
+    const boundaryToggle = document.createElement("input");
+    boundaryToggle.type = "checkbox";
+    boundaryToggle.id = "suburb-boundaries-checkbox";
+    boundaryToggle.value = "suburbs";
+    boundaryToggle.checked = true;
+
+    const boundaryToggleLabel = document.createElement("label");
+    boundaryToggleLabel.htmlFor = "suburb-boundaries-checkbox";
+    boundaryToggleLabel.innerText = "Suburb Outlines";
+    boundaryToggleLabel.id = "suburb-boundaries-label";
+
+    boundaryContainer.appendChild(boundaryToggle);
+    boundaryContainer.appendChild(boundaryToggleLabel);
+
+    boundaryToggle.addEventListener("change", (e) => {
+        // if checked show outlines, else hide
+        if(e.target.checked) {
+            map.setLayoutProperty(e.target.value, 'visibility', 'visible');
+        }
+        else {
+            map.setLayoutProperty(e.target.value, 'visibility', 'none');
+        }
+    })
+
+    return;
+}
+
 function createLegend() {
-    const legendContainer = document.createElement("div");
-    legendContainer.className = "legend";
-    legendContainer.id = "inventory-legend"
+    // create legend for stop inventory
+    const invLegendContainer = document.createElement("div");
+    invLegendContainer.className = "legend";
+    invLegendContainer.id = "inventory-legend";
 
     const legendTitle = document.createElement("h4");
     legendTitle.innerText = "Number of Stop Amenities"
-    legendContainer.appendChild(legendTitle);
+    invLegendContainer.appendChild(legendTitle);
     
     const amenity_colors = ["#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"];
 
@@ -311,10 +344,39 @@ function createLegend() {
         label.className = "legend-label";
         div.appendChild(label);
 
-        legendContainer.appendChild(div);
+        invLegendContainer.appendChild(div);
     });
 
-    document.getElementById("map").appendChild(legendContainer);
+    document.getElementById("map").appendChild(invLegendContainer);
+
+
+    // create legend for walksheds
+    const walkLegendContainer = document.createElement("div");
+    walkLegendContainer.className = "legend";
+    walkLegendContainer.id = "walkshed-legend";
+
+    const walkLegendColors = ["#019DD5", "gray"];
+    const walkLegendText = ["Bus Stops", "Walksheds"];
+
+    // two legend entries
+    for(let i = 0; i < 2; i++){
+        const div = document.createElement("div");
+        const span = document.createElement("span");
+        span.style = `background-color: ${walkLegendColors[i]}`;
+        if(i == 1) {
+            span.className = "square";
+        }
+        div.appendChild(span);
+
+        const label = document.createElement("p");
+        label.innerText = walkLegendText[i];
+        label.className = "legend-label";
+        div.appendChild(label);
+
+        walkLegendContainer.appendChild(div);
+    }
+
+    document.getElementById("map").appendChild(walkLegendContainer);
 
     return;
 }
@@ -322,4 +384,5 @@ function createLegend() {
 
 setupFilter();
 setupLayerSelect();
+setupBoundaryToggle();
 createLegend();
