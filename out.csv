@@ -4,7 +4,7 @@ stop_id,shelter,seat,timetable,advertising,other_comments,stop_name,suburb,num_a
 2763142,no,no,no,no,Not a sign to indicate,Chase Dr At Hydrangea Ct,Acacia Gardens,0
 2763143,no,no,no,no,,Chase Dr After Quakers Hill Pkwy,Acacia Gardens,0
 2763136,no,no,no,no,extremely busy street; dangerous,Quakers Hill Pkwy Before Chase Dr,Acacia Gardens,0
-2763135,yes,yes,no,yes,,Quakers Hill Pkwy After Sunnyholt Rd,Acacia Gardens,0
+2763135,yes,yes,no,yes,,Quakers Hill Pkwy After Sunnyholt Rd,Acacia Gardens,3
 276859,no,no,no,no,,Sunnyholt Rd After Wilson Rd,Acacia Gardens,0
 2763140,no,no,no,no,,Wilson Rd After Trevor Toms Dr,Acacia Gardens,0
 2763147,no,no,no,no,,Wilson Rd After Tamarind Dr,Acacia Gardens,0
@@ -13,7 +13,7 @@ stop_id,shelter,seat,timetable,advertising,other_comments,stop_name,suburb,num_a
 276366,no,no,no,no,,Wilson Rd At Sciarra Cres,Acacia Gardens,0
 2763180,no,no,no,no,,Wilson Rd Opp Sampson Cres,Acacia Gardens,0
 276367,no,no,no,no,,Wilson Rd At Sampson Cres,Acacia Gardens,0
-276327,no,no,yes,no,small schedule posted,Wilson Rd After Corinne St,Acacia Gardens,0
+276327,no,no,yes,no,small schedule posted,Wilson Rd After Corinne St,Acacia Gardens,1
 2763174,no,no,no,no,alongside 4 lane road,Quakers Hill Pkwy At Pye Rd,Acacia Gardens,0
 276369,no,no,no,no,,Quakers Hill Pkwy Before Pye Rd,Acacia Gardens,0
 2768144,Yes,Yes,Yes,Yes,"There was no available street view data on the street of the bus stop, thus the bus stop was viewed from 33°45'07""S 150°57'06""E.",,Glenwood,4
